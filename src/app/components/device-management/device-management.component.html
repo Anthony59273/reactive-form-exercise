@@ -1,0 +1,387 @@
+<div class="device-management">
+  <form
+    class="device-management__container"
+    [formGroup]="form"
+  >
+    <mat-tab-group
+      class="device-management__tabs"
+      formArrayName="attributes"
+    >
+      <mat-tab
+        *ngFor="let category of categories"
+        [label]="category.label"
+      >
+        <div class="category">
+          <p class="category__description">
+            {{ category.description }}
+          </p>
+      
+          <mat-divider></mat-divider>
+      
+          <div class="attributes">
+            <div
+              class="attribute-form"
+              *ngFor="let attribute of getCategoryAttributes(category)"
+              [formGroupName]="getAttributeIndex(attribute)"
+            >
+              <div class="attribute-form__container">
+                <div
+                  class="attribute-form__delete"
+                  (click)="removeAttribute(attribute)"
+                >
+                  <mat-icon
+                    class="attribute-form__delete__icon"
+                    color="primary"
+                  >
+                    delete
+                  </mat-icon>
+                </div>
+            
+                <div class="attribute-fields">
+                  <div class="attribute-fields__row attribute-fields__row__first">
+                    <mat-form-field
+                      class="attribute-fields__name"
+                      floatLabel="always"
+                    >
+                      <mat-label>
+                        Name:
+                      </mat-label>
+                    
+                      <input
+                        matInput
+                        formControlName="name"
+                        placeholder="Enter a name"
+                      >
+
+                      <mat-error *ngIf="attribute.get('name').invalid">
+                        {{ getAttributeInputErrorMessage(attribute.get('name')) }}
+                      </mat-error>
+                    </mat-form-field>
+            
+                    <mat-form-field
+                      class="attribute-fields__description"
+                      floatLabel="always"
+                    >
+                      <mat-label>
+                        Description:
+                      </mat-label>
+                    
+                      <input
+                        matInput
+                        formControlName="description"
+                        placeholder="Enter a description"
+                      >
+                    </mat-form-field>
+                  </div>
+            
+                  <div
+                    class="attribute-fields__row attribute-fields__row__second"
+                    *ngIf="!isAttributeWrapped(attribute)"
+                  >
+                    <mat-form-field
+                      class="attribute-fields__device-resource-type"
+                      floatLabel="always"
+                    >
+                      <mat-label>
+                          Device Resource Type:
+                      </mat-label>
+                    
+                      <mat-select
+                        formControlName="deviceResourceType"
+                        placeholder="Default Value"
+                      >
+                        <mat-option>
+                            Default Value
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+            
+                    <mat-form-field
+                      class="attribute-fields__default-value"
+                      floatLabel="always"
+                    >
+                      <mat-label>
+                          Default Value:
+                      </mat-label>
+            
+                      <input
+                        matInput
+                        formControlName="defaultValue"
+                        placeholder="Enter a default value"
+                      >
+                    </mat-form-field>
+                  </div>
+            
+                  <div
+                    class="attribute-fields__row attribute-fields__row__third"
+                    *ngIf="!isAttributeWrapped(attribute)"
+                  >
+                    <mat-form-field
+                      class="attribute-fields__data-type"
+                      floatLabel="always"
+                    >
+                      <mat-label>
+                          Data Type:
+                      </mat-label>
+            
+                      <mat-select formControlName="dataType">
+                        <mat-option
+                          *ngFor="let attributeDataType of attributeDataTypes"
+                          [value]="attributeDataType.value"
+                        >
+                          {{ attributeDataType.label }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+            
+                    <mat-form-field
+                      class="attribute-fields__format"
+                      floatLabel="always"
+                    >
+                      <mat-label>
+                          Format:
+                      </mat-label>
+            
+                      <mat-select formControlName="format">
+                        <mat-option
+                          *ngFor="let attributeFormat of attributeFormats"
+                          [value]="attributeFormat.value"
+                        >
+                          {{ attributeFormat.label }}
+                        </mat-option>
+                      </mat-select>
+                    </mat-form-field>
+                  </div>
+            
+                  <div
+                    *ngIf="areEnumerationsDisplayed(attribute) && !isAttributeWrapped(attribute)"
+                    class="attribute-enumerations"
+                  >
+                    <div class="enumeration-form">
+                      <mat-form-field
+                        class="attribute-fields__enumeration-value"
+                        floatLabel="always"
+                      >
+                        <mat-label>
+                            Enumerations:
+                        </mat-label>
+            
+                        <input
+                          matInput
+                          formControlName="enumerationValue"
+                          placeholder="Enter value"
+                        >
+                      </mat-form-field>
+            
+                      <button
+                        mat-raised-button
+                        color="primary"
+                        (click)="addEnumerationValue(attribute)"
+                        [disabled]="!attribute.get('enumerationValue').value"
+                      >
+                        Add
+                      </button>
+                    </div>
+          
+                    <div class="attribute-enumerations__list">
+                      <span class="attribute-enumerations__list__label">
+                        Values:
+                      </span>
+
+                      <div
+                        class="attribute-enumerations__list__chip"
+                        *ngFor="let enumerationValue of attribute.get('enumerationValues').value; let i = index;"
+                      >
+                        <span class="attribute-enumeration-chip__label">
+                          {{ enumerationValue.label }}
+                        </span>
+          
+                        <span
+                          class="attribute-enumeration-chip__remove"
+                          (click)="removeEnumerationValue(attribute, i)"
+                        >
+                          <mat-icon
+                            class="attribute-enumeration-chip__remove__icon"
+                            color="warn"
+                          >
+                            remove_circle
+                          </mat-icon>
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+            
+                  <div
+                    class="attribute-range"
+                    *ngIf="isRangeDisplayed(attribute) && !isAttributeWrapped(attribute)"
+                  >
+                    <div class="attribute-range__row">
+                      <mat-form-field
+                        class="attribute-fields__range-min"
+                        floatLabel="always"
+                      >
+                        <mat-label>
+                          Range:
+                        </mat-label>
+                      
+                        <input
+                          matInput
+                          class="attribute-fields__range-min"
+                          formControlName="rangeMin"
+                          placeholder="Range Min"
+                        >
+
+                        <mat-error *ngIf="attribute.get('rangeMin').invalid">
+                          {{ getAttributeInputErrorMessage(attribute.get('rangeMin')) }}
+                        </mat-error>
+                      </mat-form-field>
+              
+                      <mat-form-field
+                        class="attribute-fields__range-max"
+                        floatLabel="always"
+                      >
+                        <mat-label>
+                          &nbsp;
+                        </mat-label>
+                      
+                        <input
+                          matInput
+                          formControlName="rangeMax"
+                          placeholder="Range Max"
+                        >
+
+                        <mat-error *ngIf="attribute.get('rangeMax').invalid">
+                          {{ getAttributeInputErrorMessage(attribute.get('rangeMax')) }}
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+            
+                    <div class="attribute-range__row">
+                      <mat-form-field
+                        class="attribute-fields__range-uom"
+                        floatLabel="always"
+                      >
+                        <mat-label>
+                          Unit of Measurement:
+                        </mat-label>
+                      
+                        <input
+                          matInput
+                          formControlName="rangeUOM"
+                          placeholder="UoM (eg. mm)"
+                        >
+                      </mat-form-field>
+              
+                      <mat-form-field
+                        class="attribute-fields__range-precision"
+                        floatLabel="always"
+                      >
+                        <mat-label>
+                          Precision:
+                        </mat-label>
+                      
+                        <input
+                          matInput
+                          formControlName="rangePrecision"
+                          placeholder="Precision (eg. 0.5)"
+                        >
+
+                        <mat-error *ngIf="attribute.get('rangePrecision').invalid">
+                          {{ getAttributeInputErrorMessage(attribute.get('rangePrecision')) }}
+                        </mat-error>
+                      </mat-form-field>
+              
+                      <mat-form-field
+                        class="attribute-fields__range-accuracy"
+                        floatLabel="always"
+                      >
+                        <mat-label>
+                          Accuracy:
+                        </mat-label>
+                      
+                        <input
+                          matInput
+                          formControlName="rangeAccuracy"
+                          placeholder="Accuracy (eg. 0.5)"
+                        >
+
+                        <mat-error *ngIf="attribute.get('rangeAccuracy').invalid">
+                          {{ getAttributeInputErrorMessage(attribute.get('rangeAccuracy')) }}
+                        </mat-error>
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+            
+                <div
+                  class="attribute-form__wrap"
+                  flex="10"
+                >
+                  <mat-icon
+                    *ngIf="!isAttributeWrapped(attribute)"
+                    class="attribute-form__wrap__icon"
+                    color="primary"
+                    (click)="wrapAttribute(attribute)"
+                  >
+                      keyboard_arrow_up
+                  </mat-icon>
+            
+                  <mat-icon
+                    *ngIf="isAttributeWrapped(attribute)"
+                    class="attribute-form__unwrap__icon"
+                    color="primary"
+                    (click)="unwrapAttribute(attribute)"
+                  >
+                      keyboard_arrow_down
+                  </mat-icon>
+                </div>
+              </div>
+
+              <mat-divider
+                *ngIf="!isLastCategoryAttribute(category, attribute)"
+                class="attribute-form__divider"
+              ></mat-divider>
+            </div>
+          </div>
+
+          <div
+            class="category__add-attribute"
+            (click)="addAttribute(category)"
+          >
+            <mat-icon class="category__add-attribute__icon">
+              add_circle
+            </mat-icon>
+
+            <span class="category__add-attribute__label">
+              Add Attribute
+            </span>
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+
+    <div class="device-management__controls">
+      <button
+        mat-raised-button
+        type="button"
+      >
+        Cancel
+      </button>
+
+      <button
+        mat-raised-button
+        type="button"
+        color="primary"
+        [disabled]="!form.valid"
+      >
+        Save
+      </button>
+    </div>
+  </form>
+
+  <div class="json-live">
+    <pre>
+      {{ form.getRawValue() | json }}
+    </pre>
+  </div>
+</div>
