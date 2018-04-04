@@ -1,3 +1,8 @@
+$purple_dark: #360b84;
+$purple: #673ab7;
+$purple_light: #cec0e6;
+$gray_light: #eae3e3;
+
 .device-management {
   display: flex;
   flex-direction: row;
@@ -9,7 +14,7 @@
 }
 
 .device-management__tabs {
-  border: 2px solid #360b84;
+  border: 2px solid $purple_dark;
 }
 
 .category__description {
@@ -19,8 +24,8 @@
   display: flex;
   flex-direction: row;
   height: 40px;
-  color: #673ab7;
-  background-color: #cec0e6;
+  color: $purple;
+  background-color: $purple_light;
   cursor: pointer;
 }
 .category__add-attribute__icon {
@@ -116,7 +121,7 @@
   display: inline-flex;
   flex-direction: row;
   height: 34px;
-  background-color: #eae3e3;
+  background-color: $gray_light;
   border-radius: 2px;
   padding: 0 10px;
 }
@@ -154,7 +159,7 @@
 .attribute-form__wrap__icon, .attribute-form__unwrap__icon {
   padding: 1px;
   border-radius: 18px;
-  background-color: #cec0e6;
+  background-color: $purple_light;
 }
 
 .attribute-form__divider {

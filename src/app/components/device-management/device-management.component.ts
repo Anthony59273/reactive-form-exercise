@@ -16,7 +16,7 @@ import { ERROR_MESSAGES } from '../../constants/attribute-input-errors.constant'
 @Component({
   selector: 'app-device-management',
   templateUrl: './device-management.component.html',
-  styleUrls: ['./device-management.component.css']
+  styleUrls: ['./device-management.component.scss']
 })
 export class DeviceManagementComponent implements OnInit, OnDestroy {
 
